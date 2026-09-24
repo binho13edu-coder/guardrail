@@ -1,0 +1,8 @@
+rules:
+  - name: "Public access enabled in structured configuration"
+    description: "A configuração habilita acesso público. Dados ou serviços podem ficar expostos sem os controles de autenticação esperados."
+    pattern: "config.boolean-true"
+    type: "CONFIG"
+    severity: "HIGH"
+    target_files: ["*.json", "*.yaml", "*.yml"]
+    match_keys: ["allow_public_access", "public_access", "publicly_accessible"]

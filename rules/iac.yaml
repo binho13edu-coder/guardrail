@@ -1,0 +1,31 @@
+rules:
+  - name: "Dockerfile runs as root"
+    description: "O container usa o usuário root. Se comprometido, o invasor terá privilégios ampliados dentro do container."
+    pattern: "docker.user-root"
+    type: "CONFIG"
+    severity: "HIGH"
+    target_files: ["Dockerfile", "Dockerfile.*"]
+  - name: "Dockerfile uses mutable image tag"
+    description: "A imagem não está fixada por digest SHA-256. Builds futuros podem consumir uma imagem diferente e não auditada."
+    pattern: "docker.mutable-tag"
+    type: "CONFIG"
+    severity: "MEDIUM"
+    target_files: ["Dockerfile", "Dockerfile.*"]
+  - name: "Dockerfile uses ADD"
+    description: "ADD pode extrair arquivos e buscar fontes remotas. COPY reduz comportamentos implícitos e torna o build mais previsível."
+    pattern: "docker.add"
+    type: "CONFIG"
+    severity: "MEDIUM"
+    target_files: ["Dockerfile", "Dockerfile.*"]
+  - name: "Terraform public access enabled"
+    description: "O recurso permite acesso público. Dados ou serviços podem ficar expostos à internet sem autenticação adequada."
+    pattern: "terraform.public-access"
+    type: "CONFIG"
+    severity: "CRITICAL"
+    target_files: ["*.tf"]
+  - name: "Terraform EBS volume encryption missing"
+    description: "O volume EBS não declara encrypted = true. Dados armazenados podem ficar desprotegidos em caso de acesso ao volume."
+    pattern: "terraform.volume-encryption"
+    type: "CONFIG"
+    severity: "HIGH"
+    target_files: ["*.tf"]
