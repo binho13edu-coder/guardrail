@@ -9,17 +9,20 @@ import (
 	"github.com/binho13edu-coder/guardrail/pkg/scanner"
 )
 
-func PrintConsole(writer io.Writer, findings []scanner.Finding) {
+func PrintConsole(writer io.Writer, findings []scanner.Finding) error {
 	if len(findings) == 0 {
-		color.New(color.FgGreen).Fprintln(writer, "No security findings detected.")
-		return
+		_, err := color.New(color.FgGreen).Fprintln(writer, "No security findings detected.")
+		return err
 	}
 
 	for _, finding := range findings {
 		severity := severityColor(finding.Severity).Sprint(finding.Severity)
-		fmt.Fprintf(writer, "[%s] %s:%d — %s (%s)\n", severity, finding.FilePath, finding.LineNumber, finding.RuleName, finding.Description)
+		if _, err := fmt.Fprintf(writer, "[%s] %s:%d — %s (%s)\n", severity, finding.FilePath, finding.LineNumber, finding.RuleName, finding.Description); err != nil {
+			return err
+		}
 	}
-	fmt.Fprintf(writer, "\n%d finding(s) detected.\n", len(findings))
+	_, err := fmt.Fprintf(writer, "\n%d finding(s) detected.\n", len(findings))
+	return err
 }
 
 func severityColor(severity string) *color.Color {
