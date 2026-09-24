@@ -3,6 +3,8 @@ package cmd
 import (
 	"errors"
 	"fmt"
+	"io"
+	"os"
 	"path/filepath"
 
 	"github.com/binho13edu-coder/guardrail/pkg/logging"
@@ -16,6 +18,8 @@ var rulesFile string
 var threshold string
 var logFormat string
 var verbose bool
+var outputFormat string
+var outputFile string
 
 var scanCmd = &cobra.Command{
 	Use:   "scan <path>",
@@ -49,7 +53,9 @@ var scanCmd = &cobra.Command{
 			return err
 		}
 
-		reporter.PrintConsole(cmd.OutOrStdout(), findings)
+		if err := writeReport(cmd.OutOrStdout(), findings); err != nil {
+			return err
+		}
 		logger.Info("scan completed", zap.Int("findings", len(findings)))
 		shouldFail, err := scanner.MeetsThreshold(findings, threshold)
 		if err != nil {
@@ -67,5 +73,30 @@ func init() {
 	scanCmd.Flags().StringVar(&threshold, "threshold", "critical", "falha o processo em critical, high, medium, low ou none")
 	scanCmd.Flags().StringVar(&logFormat, "log-format", "console", "formato de logs: console ou json")
 	scanCmd.Flags().BoolVarP(&verbose, "verbose", "v", false, "emite logs de diagnóstico")
+	scanCmd.Flags().StringVar(&outputFormat, "format", "console", "formato do relatório: console ou sarif")
+	scanCmd.Flags().StringVarP(&outputFile, "output", "o", "", "arquivo de saída do relatório")
 	rootCmd.AddCommand(scanCmd)
+}
+
+func writeReport(defaultWriter io.Writer, findings []scanner.Finding) error {
+	writer := defaultWriter
+	var file *os.File
+	if outputFile != "" {
+		createdFile, err := os.Create(outputFile)
+		if err != nil {
+			return fmt.Errorf("create output file: %w", err)
+		}
+		file = createdFile
+		defer file.Close()
+		writer = file
+	}
+	switch outputFormat {
+	case "console":
+		reporter.PrintConsole(writer, findings)
+		return nil
+	case "sarif":
+		return reporter.WriteSARIF(writer, findings)
+	default:
+		return fmt.Errorf("invalid format %q: use console or sarif", outputFormat)
+	}
 }

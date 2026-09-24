@@ -1,0 +1,23 @@
+name: GuardRail Code Scanning
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+  security-events: write
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "1.22.x"
+      - run: go run . scan . --format sarif --output guardrail.sarif --threshold none
+      - uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: guardrail.sarif
