@@ -63,7 +63,7 @@ resource "aws_s3_bucket" "assets" {
 
 ## Performance
 
-The baseline benchmark for mixed regex, Dockerfile, and Terraform scanning measured **1.63 ms/op**, **220 KB/op**, and **135 allocations/op** on an AMD Ryzen 5 PRO 5655GE. Measure on your own CI runner before using this as a capacity estimate:
+The current benchmark for mixed regex, Dockerfile, and Terraform scanning measured **2.49 ms/op**, **220 KB/op**, and **135 allocations/op** on an AMD Ryzen 5 PRO 5655GE. Measure on your own CI runner before using this as a capacity estimate:
 
 ```bash
 go test -run='^$' -bench=. -benchmem ./pkg/scanner
@@ -87,6 +87,24 @@ go mod tidy
 go vet ./...
 go test -race ./...
 go test -bench=. ./...
+```
+
+## GitHub Action
+
+Add GuardRail to a workflow with configurable policies and threshold handling:
+
+```yaml
+permissions:
+  contents: read
+  security-events: write
+
+steps:
+  - uses: actions/checkout@v4
+  - uses: binho13edu-coder/guardrail@v1
+    with:
+      threshold: high
+      rules: rules
+      upload-sarif: 'true'
 ```
 
 ## Roadmap

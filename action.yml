@@ -1,0 +1,46 @@
+name: GuardRail security scan
+description: Run GuardRail and optionally upload its SARIF report to GitHub Code Scanning.
+author: binho13edu-coder
+branding:
+  icon: shield
+  color: blue
+inputs:
+  threshold:
+    description: Minimum severity that fails the scan.
+    required: false
+    default: critical
+  rules:
+    description: Rules file or directory relative to the caller workspace.
+    required: false
+    default: rules
+  path:
+    description: Path to scan relative to the caller workspace.
+    required: false
+    default: .
+  upload-sarif:
+    description: Upload the generated SARIF report to GitHub Code Scanning.
+    required: false
+    default: 'true'
+runs:
+  using: composite
+  steps:
+    - name: Set up Go
+      uses: actions/setup-go@v5
+      with:
+        go-version: '1.22.x'
+    - name: Run GuardRail
+      shell: bash
+      env:
+        INPUT_THRESHOLD: ${{ inputs.threshold }}
+        INPUT_RULES: ${{ inputs.rules }}
+        INPUT_PATH: ${{ inputs.path }}
+      run: |
+        go run github.com/binho13edu-coder/guardrail@v0.1.0 scan "$INPUT_PATH" --rules "$INPUT_RULES" --format sarif --output guardrail.sarif --threshold none
+        if [[ "$INPUT_THRESHOLD" != "none" ]]; then
+          go run github.com/binho13edu-coder/guardrail@v0.1.0 scan "$INPUT_PATH" --rules "$INPUT_RULES" --threshold "$INPUT_THRESHOLD"
+        fi
+    - name: Upload SARIF
+      if: ${{ inputs.upload-sarif == 'true' }}
+      uses: github/codeql-action/upload-sarif@v3
+      with:
+        sarif_file: guardrail.sarif

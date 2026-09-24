@@ -78,3 +78,13 @@ Use `terraform.public-access` or `terraform.volume-encryption`. Terraform is par
 ## CI behavior
 
 Use `--threshold` to make findings fail a pipeline: `critical` (default), `high`, `medium`, `low`, or `none`. Exit code `1` means that findings met the threshold; exit code `2` indicates an execution, parsing, or configuration error.
+
+## SARIF output
+
+Use `--format sarif` to emit SARIF 2.1.0. Each finding becomes a SARIF result with its rule ID, severity level, impact description, source file, and line number. This is the format consumed by GitHub Code Scanning and other security platforms.
+
+```bash
+guardrail scan . --format sarif --output guardrail.sarif --threshold none
+```
+
+`CRITICAL` and `HIGH` map to SARIF `error`, `MEDIUM` to `warning`, and `LOW` to `note`.
