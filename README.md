@@ -6,6 +6,8 @@
 
 GuardRail is a fast DevSecOps CLI that catches exposed secrets and insecure infrastructure configuration before it reaches CI/CD.
 
+[Documentation](docs/rule-authoring.md) · [Report a bug](https://github.com/binho13edu-coder/guardrail/issues/new?template=bug_report.md) · [Contribute](CONTRIBUTING.md) · [Security](SECURITY.md)
+
 ## The problem
 
 Security checks are often added late, run slowly, and return a vague warning with no operational context. That lets secrets, public resources, and unsafe container settings reach pull requests and deployment pipelines.
@@ -16,10 +18,17 @@ GuardRail combines streaming secret detection with policy-driven configuration a
 
 ```mermaid
 flowchart LR
-  A[Discovery] --> B[Parsing]
-  B --> C[Policy engine]
-  C --> D[Reporter]
-  D --> E[Console or CI result]
+  A[Discovery] --> B{File type and policy}
+  B -->|Text or REGEX rule| C[Streaming regex matcher]
+  B -->|Terraform| D[HCL AST parser]
+  B -->|JSON or YAML| E[Structured data parser]
+  B -->|Dockerfile| F[Simplified instruction AST]
+  C --> G[Policy engine]
+  D --> G
+  E --> G
+  F --> G
+  G --> H[Severity and impact]
+  H --> I[Console report or CI exit code]
 ```
 
 ## Quick start
@@ -63,6 +72,13 @@ go test -run='^$' -bench=. -benchmem ./pkg/scanner
 ## Rules
 
 Rules are YAML files loaded from `rules/` by default. See the full [rule-authoring guide](docs/rule-authoring.md) to create regex and structured `CONFIG` policies.
+
+## Known limitations
+
+- Terraform policies use a real HCL AST, but currently cover the resource and attributes defined by the bundled policies only.
+- Dockerfiles use a lightweight instruction AST; it is not a complete Docker build parser.
+- JSON/YAML public-access rules evaluate configured boolean keys. Indirect values, templates, and provider-specific semantics may need additional policies.
+- Files larger than 10 MiB skip structured parsing to bound memory use; regex scanning still runs.
 
 ## Development
 
