@@ -122,7 +122,7 @@ func scanRegexPolicies(context AnalysisContext, rules []CompiledRule) ([]Finding
 	if err != nil {
 		return nil, fmt.Errorf("open file %q: %w", context.FilePath, err)
 	}
-	defer file.Close()
+	defer func() { _ = file.Close() }()
 	lineScanner := bufio.NewScanner(file)
 	lineScanner.Buffer(make([]byte, 64*1024), 1024*1024)
 	for lineNumber := 1; lineScanner.Scan(); lineNumber++ {
