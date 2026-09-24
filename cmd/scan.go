@@ -30,7 +30,7 @@ var scanCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
-		defer logger.Sync()
+		defer func() { _ = logger.Sync() }()
 
 		targetPath, err := filepath.Abs(args[0])
 		if err != nil {
@@ -87,13 +87,12 @@ func writeReport(defaultWriter io.Writer, findings []scanner.Finding) error {
 			return fmt.Errorf("create output file: %w", err)
 		}
 		file = createdFile
-		defer file.Close()
+		defer func() { _ = file.Close() }()
 		writer = file
 	}
 	switch outputFormat {
 	case "console":
-		reporter.PrintConsole(writer, findings)
-		return nil
+		return reporter.PrintConsole(writer, findings)
 	case "sarif":
 		return reporter.WriteSARIF(writer, findings)
 	default:
