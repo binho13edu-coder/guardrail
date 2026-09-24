@@ -35,9 +35,9 @@ runs:
         INPUT_RULES: ${{ inputs.rules }}
         INPUT_PATH: ${{ inputs.path }}
       run: |
-        go run github.com/binho13edu-coder/guardrail@v0.1.0 scan "$INPUT_PATH" --rules "$INPUT_RULES" --format sarif --output guardrail.sarif --threshold none
+        go run github.com/binho13edu-coder/guardrail@main scan "$INPUT_PATH" --rules "$INPUT_RULES" --format sarif --output guardrail.sarif --threshold none
         if [[ "$INPUT_THRESHOLD" != "none" ]]; then
-          go run github.com/binho13edu-coder/guardrail@v0.1.0 scan "$INPUT_PATH" --rules "$INPUT_RULES" --threshold "$INPUT_THRESHOLD"
+          go run github.com/binho13edu-coder/guardrail@main scan "$INPUT_PATH" --rules "$INPUT_RULES" --threshold "$INPUT_THRESHOLD"
         fi
     - name: Upload SARIF
       if: ${{ inputs.upload-sarif == 'true' }}

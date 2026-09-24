@@ -6,7 +6,7 @@
 
 GuardRail is a fast DevSecOps CLI that catches exposed secrets and insecure infrastructure configuration before it reaches CI/CD.
 
-[Documentation](docs/rule-authoring.md) · [Report a bug](https://github.com/binho13edu-coder/guardrail/issues/new?template=bug_report.md) · [Contribute](CONTRIBUTING.md) · [Security](SECURITY.md)
+[Documentation](docs/rule-authoring.md) · [Report a bug](https://github.com/binho13edu-coder/guardrail/issues/new?template=bug_report.md) · [Contribute](CONTRIBUTING.md) · [Security](SECURITY.md) · [Support the project](docs/sponsorship.md)
 
 ## The problem
 
@@ -100,12 +100,20 @@ permissions:
 
 steps:
   - uses: actions/checkout@v4
-  - uses: binho13edu-coder/guardrail@v1
+  - uses: binho13edu-coder/guardrail@main
     with:
       threshold: high
       rules: rules
       upload-sarif: 'true'
 ```
+
+Pin a release tag instead of `main` in production once a compatible version is available.
+
+## Support GuardRail
+
+GuardRail is maintained as an open-source security project. Financial support helps fund CI runners, dependency and vulnerability triage, documentation, and time spent reviewing community contributions. If GitHub Sponsors is enabled for the maintainer account, the **Sponsor** button on this repository is the preferred way to contribute.
+
+Sponsorship is voluntary and does not purchase a security exception, guaranteed response time, or preferential vulnerability handling. See the [sponsorship and sustainability plan](docs/sponsorship.md) for the proposed funding model and transparency commitments.
 
 ## Roadmap
 

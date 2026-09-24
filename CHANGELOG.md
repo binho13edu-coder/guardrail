@@ -2,6 +2,13 @@
 
 All notable changes to GuardRail are documented here.
 
+## [Unreleased]
+
+### Added
+
+- GitHub Sponsors configuration and a transparent sustainability plan for maintainers and organizational supporters.
+- Contribution guidance explaining how financial support relates to security triage and project governance.
+
 ## [0.1.0] - 2026-09-24
 
 ### Added
