@@ -4,12 +4,13 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
+	"strings"
 	"testing"
 )
 
 func BenchmarkScanPathRegexAndIaC(b *testing.B) {
 	directory := b.TempDir()
-	writeBenchmarkFile(b, filepath.Join(directory, "app.env"), "api_key=12345678901234567890123456789012\n")
+	writeBenchmarkFile(b, filepath.Join(directory, "app.env"), "api_key="+strings.Repeat("1", 32)+"\n")
 	writeBenchmarkFile(b, filepath.Join(directory, "Dockerfile"), "FROM node:latest\nUSER root\n")
 	writeBenchmarkFile(b, filepath.Join(directory, "main.tf"), "resource \"aws_ebs_volume\" \"data\" {\n  size = 20\n}\n")
 	rules := []CompiledRule{

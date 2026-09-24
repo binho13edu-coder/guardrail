@@ -4,15 +4,17 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
+	"strings"
 	"testing"
 )
 
 func TestScanPathFindsSecretsAndIgnoresDirectories(t *testing.T) {
 	t.Parallel()
 	directory := t.TempDir()
-	writeTestFile(t, filepath.Join(directory, "config.env"), "api_key=12345678901234567890123456789012\n")
-	writeTestFile(t, filepath.Join(directory, "node_modules", "ignored.env"), "api_key=12345678901234567890123456789012\n")
-	writeTestFile(t, filepath.Join(directory, ".git", "config"), "api_key=12345678901234567890123456789012\n")
+	token := "api_key=" + strings.Repeat("1", 32) + "\n"
+	writeTestFile(t, filepath.Join(directory, "config.env"), token)
+	writeTestFile(t, filepath.Join(directory, "node_modules", "ignored.env"), token)
+	writeTestFile(t, filepath.Join(directory, ".git", "config"), token)
 
 	rules := []CompiledRule{{Rule: Rule{Name: "API key", Severity: "HIGH"}, Regex: mustCompile(t, `api_key=\w{32}`)}}
 	findings, err := ScanPath(directory, rules)
